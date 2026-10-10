@@ -53,8 +53,3 @@ Early development — architecture, requirements, and initial implementation are
 - Interactive dashboards
 - Evaluation on diverse real-world datasets
 
-
-
-
-
-Arshiya Tariq
