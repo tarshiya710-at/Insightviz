@@ -3,34 +3,26 @@ import pandas as pd
 from db_connection import get_connection
 
 
-def execute_sql(sql):
+def execute_sql(sql, database="insightviz"):
 
-    # Allow only SELECT queries for safety
     cleaned_sql = sql.strip().rstrip(";")
 
     if not cleaned_sql.upper().startswith("SELECT"):
         raise ValueError("Only SELECT queries are allowed.")
 
-    conn = get_connection()
+    conn = get_connection(database)
 
     try:
-        df = pd.read_sql_query(cleaned_sql, conn)
+        cursor = conn.cursor()
+        cursor.execute(cleaned_sql)
+
+        rows = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+
+        df = pd.DataFrame(rows, columns=columns)
+
+        cursor.close()
         return df
 
     finally:
         conn.close()
-
-
-if __name__ == "__main__":
-
-    query = """
-    SELECT category,
-           SUM(quantity * price) AS total_sales
-    FROM demo_sales
-    GROUP BY category
-    """
-
-    result = execute_sql(query)
-
-    print("\nQuery Results:")
-    print(result)
